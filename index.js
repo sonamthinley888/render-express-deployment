@@ -120,9 +120,14 @@ app.post("/removeproduct", async (req, res) => {
 
 // Creating API for getting all products
 app.get("/allproducts", async (req, res) => {
-  let products = await Product.find({});
-  console.log("All Products Fetched");
-  res.send(products);
+  try {
+    let products = await Product.find({});
+    console.log("All Products Fetched");
+    res.json(products); // Sending the response as JSON
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ error: "Failed to fetch products" }); // Send error response with proper status and message
+  }
 });
 
 // Schema creating for user model
@@ -151,12 +156,10 @@ const Users = mongoose.model("Users", {
 app.post("/signup", async (req, res) => {
   let check = await Users.findOne({ email: req.body.email });
   if (check) {
-    return res
-      .status(400)
-      .json({
-        success: false,
-        errors: "existing user found with same email address",
-      });
+    return res.status(400).json({
+      success: false,
+      errors: "existing user found with same email address",
+    });
   }
   let cart = {};
   for (let i = 0; i < 300; i++) {
@@ -207,7 +210,7 @@ app.get("/newcollections", async (req, res) => {
   let products = await Product.find({});
   let newcollection = products.slice(1).slice(-8);
   console.log("New Collection Fetched");
-  res.send(newcollection);
+  res.json(newcollection); // Use res.json() to ensure the response is treated as JSON
 });
 
 // Creating endpoint for popular in women section
@@ -215,7 +218,7 @@ app.get("/popularinwomen", async (req, res) => {
   let product = await Product.find({ category: "women" });
   let popular_in_women = product.slice(0, 4);
   console.log("Popular in women fetched");
-  res.send(popular_in_women);
+  res.json(popular_in_women); // Use res.json() here as well
 });
 
 // Creating middelware to fetch user
@@ -270,7 +273,7 @@ app.post("/getcart", fetchUser, async (req, res) => {
 
 // Root Route
 app.get("/", (req, res) => {
-  res.send("Express App is running on Render");
+  res.json({ message: "Express App is running on Render" }); // Return as JSON
 });
 
 // Start Server (Only ONE app.listen)
