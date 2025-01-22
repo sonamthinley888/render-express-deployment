@@ -4,7 +4,11 @@ const port = process.env.PORT || 4000;
 
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
+
 const multer = require("multer");
+const multerGoogleStorage = require("multer-google-storage");
+const bucket = require("./config/googleCloud"); // Import Google Cloud Storage config
+
 const path = require("path");
 const cors = require("cors");
 const { log } = require("console");
@@ -19,28 +23,29 @@ mongoose.connect(
   "mongodb+srv://coder_91:uECOnjGAtng3UDhV@cluster0.ln6blra.mongodb.net/e-commerce"
 );
 
-// Image Storage Engine
-const storage = multer.diskStorage({
-  destination: "./upload/images",
-  filename: (req, file, cb) => {
-    return cb(
-      null,
-      `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`
-    );
-  },
+// Create multer storage engine that uploads directly to Google Cloud Storage
+const storage = multerGoogleStorage.storageEngine({
+  bucket: "shopper-product-images", // Replace with your bucket name
+  projectId: "crypto-groove-448608-s4", // Replace with your Google Cloud project ID
+  acl: "publicRead", // Public read access
+  keyFilename: "/service-account-key.json", // Path to your service account file
 });
 
-const upload = multer({ storage: storage });
+// Multer upload middleware
+const upload = multer({ storage });
 
 //Creating Upload Endpoint for Images
 
 app.use("/images", express.static("upload/images"));
 
+// Route to upload image
 app.post("/upload", upload.single("product"), (req, res) => {
-  res.json({
-    success: 1,
-    image_url: `https://shopper-e-commerce-website-jheh.onrender.com/images/${req.file.filename}`,
-  });
+  if (!req.file) {
+    return res.status(400).send({ error: "No file uploaded" });
+  }
+
+  const imageUrl = `https://storage.googleapis.com/${req.file.bucket}/${req.file.filename}`;
+  res.json({ success: 1, image_url: imageUrl });
 });
 
 // // Schema for Creating Products
