@@ -16,7 +16,7 @@ app.use(cors()); // This allows all origins
 
 // Database Connection with MongoDB
 mongoose.connect(
-  "mongodb+srv://coder_91:stj_mongo25@cluster0.ln6blra.mongodb.net/e-commerce"
+  "mongodb+srv://coder_91:uECOnjGAtng3UDhV@cluster0.ln6blra.mongodb.net/e-commerce"
 );
 
 // Image Storage Engine
