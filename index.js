@@ -121,12 +121,23 @@ app.post("/removeproduct", async (req, res) => {
 // Creating API for getting all products
 app.get("/allproducts", async (req, res) => {
   try {
-    let products = await Product.find({});
+    let products = await Product.find({}); // Fetch products from database
     console.log("All Products Fetched");
-    res.json(products); // Sending the response as JSON
+
+    // Send a structured response
+    res.json({
+      success: true,
+      products: products,
+    });
   } catch (error) {
     console.error("Error fetching products:", error);
-    res.status(500).json({ error: "Failed to fetch products" }); // Send error response with proper status and message
+
+    // Send error response with proper status and message
+    res.status(500).json({
+      success: false,
+      error: "Failed to fetch products",
+      details: error.message, // Include error details for debugging
+    });
   }
 });
 
