@@ -13,7 +13,10 @@ const { stringify } = require("querystring");
 const { fstat } = require("fs");
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000',  // Allow only localhost:3000
+}));
+
 
 // Database Connection with MongoDB
 mongoose.connect("mongodb+srv://coder_91:Stj_mongo24@cluster0.ln6blra.mongodb.net/e-commerce")
